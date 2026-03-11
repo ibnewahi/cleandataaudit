@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CleanDataAudit.com — Data Quality for the AI Era</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,600;0,700;1,300&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c:#0891B2;--c2:#06B6D4;--c3:#67E8F9;--c4:#083344;
+  --bg:#F0FAFA;--bg2:#E0F5F9;--bg3:#FFFFFF;
+  --bk:#06131A;--bk2:#0D2030;
+  --b:rgba(8,145,178,.2);--bs:rgba(8,145,178,.08);
+  --t:#06131A;--tm:#3A6070;--td:#8AAABB;
+  --gr:#059669;--re:#DC2626;--warn:#D97706;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--t);font-family:'Raleway',sans-serif;overflow-x:hidden;}
+
+/* Subtle dots pattern */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(8,145,178,.08) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 52px;
+  background:rgba(240,250,250,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--b);
+}
+.nlogo{font-family:'Raleway',sans-serif;font-weight:700;font-size:17px;
+  color:var(--c);letter-spacing:-.3px;}
+.nlogo span{color:var(--td);}
+.ncta{padding:8px 22px;background:var(--c);color:#fff;
+  font-family:'Fira Code',monospace;font-size:10px;letter-spacing:1px;
+  text-transform:uppercase;text-decoration:none;transition:background .2s;}
+.ncta:hover{background:var(--c2);}
+
+/* HERO — clean white split */
+.hero{position:relative;z-index:1;min-height:100vh;
+  background:var(--bg3);
+  display:grid;grid-template-columns:1fr 1fr;
+  border-bottom:2px solid var(--c);}
+.hero-left{
+  padding:140px 52px 80px;
+  border-right:1px solid var(--b);
+}
+.hero-right{
+  background:var(--bk);
+  padding:80px 52px;
+  display:flex;flex-direction:column;justify-content:center;
+}
+
+.h-tag{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:3px;
+  color:var(--c);text-transform:uppercase;margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+  opacity:0;animation:up .5s .1s forwards;}
+.h-tag::before{content:'';width:16px;height:1px;background:var(--c);}
+
+.hero-h1{font-size:clamp(38px,5.5vw,70px);font-weight:700;line-height:1.0;
+  letter-spacing:-1.5px;color:var(--bk);
+  opacity:0;animation:up .6s .25s forwards;}
+.hero-h1 em{font-style:italic;color:var(--c);font-weight:300;}
+
+.hero-sub{max-width:420px;margin-top:24px;font-size:15px;
+  line-height:1.8;color:var(--tm);font-weight:300;
+  opacity:0;animation:up .6s .4s forwards;}
+
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;
+  opacity:0;animation:up .6s .5s forwards;}
+.pill{padding:4px 14px;border:1px solid var(--b);
+  font-family:'Fira Code',monospace;font-size:9px;letter-spacing:1px;
+  color:var(--c);background:var(--bs);}
+
+.hero-cta{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;
+  opacity:0;animation:up .6s .62s forwards;}
+.btn-c{padding:13px 28px;background:var(--c);color:#fff;
+  font-family:'Fira Code',monospace;font-size:10px;letter-spacing:1px;
+  text-transform:uppercase;text-decoration:none;display:inline-block;
+  transition:background .2s;}
+.btn-c:hover{background:var(--c2);}
+.btn-co{padding:13px 28px;background:transparent;color:var(--tm);
+  font-family:'Fira Code',monospace;font-size:10px;letter-spacing:1px;
+  text-transform:uppercase;border:1px solid var(--b);text-decoration:none;
+  display:inline-block;transition:all .2s;}
+.btn-co:hover{border-color:var(--c);color:var(--c);}
+
+/* Data quality console (dark side) */
+.dq-console{opacity:0;animation:up .6s .3s forwards;}
+.dq-title{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--td);margin-bottom:16px;}
+.dq-table{width:100%;border-collapse:collapse;}
+.dq-table th{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--td);padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);text-align:left;}
+.dq-table td{font-family:'Fira Code',monospace;font-size:11px;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);
+  color:#A0B8C0;vertical-align:middle;}
+.dq-table td:first-child{color:#E0F5F9;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.score-bar{display:flex;align-items:center;gap:8px;}
+.sb{height:4px;width:80px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;}
+.sb-fill{height:100%;border-radius:2px;}
+.dq-summary{margin-top:20px;padding:14px;background:rgba(8,145,178,.08);
+  border:1px solid rgba(8,145,178,.2);display:flex;justify-content:space-between;}
+.dqs-label{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--td);margin-bottom:4px;}
+.dqs-val{font-family:'Fira Code',monospace;font-size:16px;color:var(--c3);}
+
+/* STATS */
+.stats{position:relative;z-index:1;
+  background:var(--bk);
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-bottom:2px solid var(--c);}
+.st{padding:28px 36px;border-right:1px solid rgba(255,255,255,.06);}
+.st:last-child{border-right:none;}
+.st-num{font-size:34px;font-weight:700;color:var(--c2);font-family:'Raleway',sans-serif;line-height:1;}
+.st-label{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:6px;}
+
+/* SECTION */
+.section{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:88px 52px;}
+.s-tag{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:3px;
+  color:var(--td);text-transform:uppercase;margin-bottom:14px;}
+.s-h{font-size:clamp(26px,3.5vw,44px);font-weight:700;line-height:1.1;letter-spacing:-.5px;color:var(--bk);}
+.s-h em{font-style:italic;color:var(--c);font-weight:300;}
+
+/* Process steps */
+.process{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  margin-top:48px;border:1px solid var(--b);background:var(--b);}
+.pc{background:var(--bg3);padding:28px 24px;position:relative;}
+.pc-step{font-family:'Fira Code',monospace;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--c);margin-bottom:12px;}
+.pc-icon{font-size:28px;margin-bottom:10px;}
+.pc-title{font-size:15px;font-weight:600;color:var(--bk);margin-bottom:6px;}
+.pc-desc{font-size:12px;line-height:1.7;color:var(--tm);}
+.pc-arrow{position:absolute;right:-14px;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;background:var(--c);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:12px;z-index:2;}
+.pc:last-child .pc-arrow{display:none;}
+
+/* Why grid */
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;}
+.wg{background:var(--bg3);border:1px solid var(--b);padding:28px 24px;
+  transition:border-color .2s,box-shadow .2s;}
+.wg:hover{border-color:var(--c);box-shadow:0 0 0 1px var(--c);}
+.wg-icon{font-size:22px;margin-bottom:12px;}
+.wg-title{font-family:'Fira Code',monospace;font-size:11px;letter-spacing:1px;
+  text-transform:uppercase;color:var(--c);margin-bottom:8px;}
+.wg-desc{font-size:13px;line-height:1.75;color:var(--tm);}
+
+/* Buyers */
+.buyer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:40px;}
+.bg2{background:var(--bg3);border:1px solid var(--b);padding:28px 24px;
+  border-top:3px solid var(--c);transition:box-shadow .2s;}
+.bg2:hover{box-shadow:0 4px 20px rgba(8,145,178,.1);}
+.bg2-num{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:3px;color:var(--td);margin-bottom:10px;}
+.bg2-title{font-size:17px;font-weight:600;color:var(--bk);margin-bottom:6px;}
+.bg2-desc{font-size:13px;line-height:1.75;color:var(--tm);}
+.bg2-badge{display:inline-block;margin-top:10px;padding:3px 10px;
+  background:var(--bs);border:1px solid var(--b);
+  font-family:'Fira Code',monospace;font-size:9px;letter-spacing:1px;color:var(--c);}
+
+/* ACQUIRE — dark */
+.acquire{position:relative;z-index:1;background:var(--bk);border-top:2px solid var(--c);}
+.acq-inner{max-width:1200px;margin:0 auto;padding:88px 52px;
+  display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+.acq-text h2{font-size:clamp(24px,3vw,40px);font-weight:700;letter-spacing:-.5px;
+  color:#E0F5F9;margin-bottom:20px;line-height:1.1;}
+.acq-text h2 em{font-style:italic;color:var(--c2);}
+.acq-text p{font-size:14px;line-height:1.85;color:rgba(255,255,255,.4);margin-bottom:14px;}
+.price-card{background:var(--bk2);border:1px solid rgba(8,145,178,.3);padding:44px;
+  position:relative;}
+.price-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c);}
+.pc-label{font-family:'Fira Code',monospace;font-size:9px;letter-spacing:3px;
+  color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:10px;}
+.pc-price{font-size:52px;font-weight:700;color:var(--c2);letter-spacing:-1px;line-height:1;}
+.pc-sub{font-family:'Fira Code',monospace;font-size:11px;color:rgba(255,255,255,.3);
+  margin-top:4px;margin-bottom:28px;}
+.pc-div{height:1px;background:rgba(255,255,255,.06);margin:18px 0;}
+.pc-feat{display:flex;gap:10px;font-size:13px;color:rgba(255,255,255,.45);
+  line-height:1.6;margin-bottom:10px;}
+.pc-feat::before{content:'✓';color:var(--c2);font-family:'Fira Code',monospace;flex-shrink:0;}
+
+footer{position:relative;z-index:1;background:var(--bk);
+  border-top:1px solid rgba(255,255,255,.05);
+  padding:20px 52px;display:flex;justify-content:space-between;
+  font-family:'Fira Code',monospace;font-size:9px;color:rgba(255,255,255,.2);
+  letter-spacing:1px;flex-wrap:wrap;gap:10px;}
+
+@keyframes up{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+@media(max-width:900px){
+  nav{padding:14px 20px;}
+  .hero{grid-template-columns:1fr;}
+  .hero-left{border-right:none;border-bottom:1px solid var(--b);padding:110px 20px 40px;}
+  .hero-right{padding:40px 20px;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .section{padding:60px 20px;}
+  .process{grid-template-columns:1fr;}
+  .pc-arrow{display:none!important;}
+  .why-grid,.buyer-grid{grid-template-columns:1fr;}
+  .acq-inner{grid-template-columns:1fr;}
+  footer{padding:16px 20px;flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nlogo">CleanData<span>Audit.com</span></div>
+  <a href="#acquire" class="ncta">Acquire</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="h-tag">💎 Solid Domain · Data Quality · AI Readiness</div>
+    <h1 class="hero-h1">Bad Data.<br><em>Broken AI.</em><br>Fixed Here.</h1>
+    <p class="hero-sub">Before any AI agent can be trusted, its data must be clean. CleanDataAudit.com owns the brand for the foundational layer every AI system depends on — data quality, integrity, and AI readiness auditing.</p>
+    <div class="hero-pills">
+      <span class="pill">Data Quality</span>
+      <span class="pill">AI Readiness</span>
+      <span class="pill">MLOps</span>
+      <span class="pill">Data Audit</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#acquire" class="btn-c">Acquire for $3,200</a>
+      <a href="#why" class="btn-co">See the Market →</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="dq-console">
+      <div class="dq-title">Data Quality Audit — live scan</div>
+      <table class="dq-table">
+        <thead>
+          <tr>
+            <th>Dataset</th>
+            <th>Quality Score</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>customer_profiles</td>
+            <td><div class="score-bar"><div class="sb"><div class="sb-fill" style="width:92%;background:#06B6D4;"></div></div>92%</div></td>
+            <td><span class="status-dot" style="background:#059669;"></span>Clean</td>
+          </tr>
+          <tr>
+            <td>transaction_log</td>
+            <td><div class="score-bar"><div class="sb"><div class="sb-fill" style="width:67%;background:#D97706;"></div></div>67%</div></td>
+            <td><span class="status-dot" style="background:#D97706;"></span>Warning</td>
+          </tr>
+          <tr>
+            <td>product_catalog</td>
+            <td><div class="score-bar"><div class="sb"><div class="sb-fill" style="width:34%;background:#DC2626;"></div></div>34%</div></td>
+            <td><span class="status-dot" style="background:#DC2626;"></span>Fail</td>
+          </tr>
+          <tr>
+            <td>agent_training_set</td>
+            <td><div class="score-bar"><div class="sb"><div class="sb-fill" style="width:88%;background:#06B6D4;"></div></div>88%</div></td>
+            <td><span class="status-dot" style="background:#059669;"></span>Clean</td>
+          </tr>
+          <tr>
+            <td>inference_logs</td>
+            <td><div class="score-bar"><div class="sb"><div class="sb-fill" style="width:51%;background:#D97706;"></div></div>51%</div></td>
+            <td><span class="status-dot" style="background:#D97706;"></span>Review</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="dq-summary">
+        <div><div class="dqs-label">AI Readiness Score</div><div class="dqs-val">66%</div></div>
+        <div><div class="dqs-label">Issues Found</div><div class="dqs-val" style="color:#DC2626;">847</div></div>
+        <div><div class="dqs-label">Est. Fix Time</div><div class="dqs-val">3.2 days</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="st"><div class="st-num">$4.5B</div><div class="st-label">Data Quality Market<br>2025</div></div>
+  <div class="st"><div class="st-num">19%</div><div class="st-label">CAGR through<br>2030</div></div>
+  <div class="st"><div class="st-num">92%</div><div class="st-label">Execs cite data quality<br>as AI #1 barrier</div></div>
+  <div class="st"><div class="st-num">$15M</div><div class="st-label">Avg cost of bad data<br>per enterprise/year</div></div>
+</div>
+
+<section id="why" class="section">
+  <div class="s-tag">// The Audit Process</div>
+  <h2 class="s-h">Clean data isn't optional.<br>It's <em>AI's foundation.</em></h2>
+  <div class="process">
+    <div class="pc">
+      <div class="pc-step">Step 01</div>
+      <div class="pc-icon">🔍</div>
+      <div class="pc-title">Discover</div>
+      <div class="pc-desc">Map every data source feeding your AI agents — databases, APIs, pipelines, and warehouses.</div>
+      <div class="pc-arrow">→</div>
+    </div>
+    <div class="pc">
+      <div class="pc-step">Step 02</div>
+      <div class="pc-icon">📊</div>
+      <div class="pc-title">Audit</div>
+      <div class="pc-desc">Score completeness, accuracy, consistency, and freshness across every dataset.</div>
+      <div class="pc-arrow">→</div>
+    </div>
+    <div class="pc">
+      <div class="pc-step">Step 03</div>
+      <div class="pc-icon">🧹</div>
+      <div class="pc-title">Clean</div>
+      <div class="pc-desc">Fix duplicates, nulls, schema violations, and outliers before they corrupt your AI outputs.</div>
+      <div class="pc-arrow">→</div>
+    </div>
+    <div class="pc">
+      <div class="pc-step">Step 04</div>
+      <div class="pc-icon">✅</div>
+      <div class="pc-title">Certify</div>
+      <div class="pc-desc">Issue an AI Readiness Certificate — your data is proven clean for production agent deployment.</div>
+      <div class="pc-arrow">→</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--bg2);border-top:1px solid var(--b);border-bottom:1px solid var(--b);max-width:100%;padding:88px 52px;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="s-tag">// Why This Domain</div>
+    <h2 class="s-h">Evergreen demand.<br><em>AI makes it urgent.</em></h2>
+    <div class="why-grid">
+      <div class="wg"><div class="wg-icon">🌊</div><div class="wg-title">Evergreen Problem</div><div class="wg-desc">Data quality has been an issue since databases were invented. AI doesn't create the problem — it amplifies it exponentially, making auditing more urgent than ever before.</div></div>
+      <div class="wg"><div class="wg-icon">🎯</div><div class="wg-title">Broad Audience</div><div class="wg-desc">Data engineers, MLOps teams, CDOs, compliance officers, and AI platform vendors all have budget and mandate for data quality. The buyer universe is large.</div></div>
+      <div class="wg"><div class="wg-icon">🔗</div><div class="wg-title">Prerequisite Category</div><div class="wg-desc">You cannot deploy reliable AI agents without clean data. This domain positions its owner as the essential first step in every AI project — guaranteed recurring demand.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="s-tag">// Ideal Acquirers</div>
+  <h2 class="s-h">Four types of <em>motivated buyers.</em></h2>
+  <div class="buyer-grid">
+    <div class="bg2"><div class="bg2-num">01 ——</div><div class="bg2-title">Data Quality SaaS</div><div class="bg2-desc">Companies like Monte Carlo, Great Expectations, or Soda building data observability platforms would use CleanDataAudit.com as a product or campaign brand with instant market resonance.</div><span class="bg2-badge">Highest budget</span></div>
+    <div class="bg2"><div class="bg2-num">02 ——</div><div class="bg2-title">Data Consulting Firms</div><div class="bg2-desc">Boutique data engineering consultancies that need a credential-signalling brand to win enterprise contracts in competitive procurement processes.</div><span class="bg2-badge">Fast decision</span></div>
+    <div class="bg2"><div class="bg2-num">03 ——</div><div class="bg2-title">MLOps / DataOps Platforms</div><div class="bg2-desc">Vendors integrating data quality checks into CI/CD pipelines for machine learning workloads — the pre-deployment clean check is a natural home for this brand.</div><span class="bg2-badge">Best fit</span></div>
+    <div class="bg2"><div class="bg2-num">04 ——</div><div class="bg2-title">Enterprise IT Audit Teams</div><div class="bg2-desc">Internal audit teams at Fortune 500 companies building AI data governance frameworks need a recognisable, credible brand for their data quality certification programme.</div><span class="bg2-badge">Long term value</span></div>
+  </div>
+</section>
+
+<section id="acquire" class="acquire">
+  <div class="acq-inner">
+    <div class="acq-text">
+      <div class="s-tag" style="color:rgba(255,255,255,.2);">// Acquisition</div>
+      <h2>The price of clean data<br><em>is always worth it.</em></h2>
+      <p>CleanDataAudit.com is an evergreen, recession-proof brand. Whether AI budgets boom or correct, data quality spend never goes to zero — it only grows as AI deployment scales.</p>
+      <p style="font-family:'Fira Code',monospace;font-size:11px;">Listed on Afternic · Escrow.com protected · 24-hour transfer</p>
+    </div>
+    <div class="price-card">
+      <div class="pc-label">Buy It Now Price</div>
+      <div class="pc-price">$3,200</div>
+      <div class="pc-sub">Floor: $1,200 · Ceiling: $7,000</div>
+      <div class="pc-div"></div>
+      <div class="pc-feat">Full .com ownership transferred immediately</div>
+      <div class="pc-feat">Escrow.com transaction protection</div>
+      <div class="pc-feat">Afternic Fast Transfer network</div>
+      <div class="pc-feat">Lease-to-Own payment plans available</div>
+      <div class="pc-div"></div>
+      <a href="mailto:nasmisbah@gmail.com?subject=Acquisition: CleanDataAudit.com" class="btn-c" style="display:block;text-align:center;">Send Acquisition Inquiry</a>
+      <a href="https://www.afternic.com" target="_blank" class="btn-co" style="display:block;text-align:center;margin-top:10px;border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.4);">View on Afternic →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>CleanDataAudit.com · Premium AI Domain</div>
+  <div>Data Quality · AI Readiness · MLOps</div>
+  <div>© 2026 · Part of AI Domain Portfolio</div>
+</footer>
+</body>
+</html>
